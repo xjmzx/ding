@@ -87,8 +87,8 @@ whose fetch fails keeps its last events.
 
 ### Daemons
 
-Linux: `systemctl` state for bitcoind, electrs, nginx and tor, a check for
-openclaw's port, and bitcoind's block height via `bitcoin-cli`. macOS: `brew
+Linux: `systemctl` state for bitcoind, electrs, nginx and tor, and
+bitcoind's block height via `bitcoin-cli`. macOS: `brew
 services` plus port checks for bitcoind and electrs. Every 20 seconds, local
 only.
 

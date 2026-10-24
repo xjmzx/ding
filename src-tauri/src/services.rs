@@ -1,8 +1,9 @@
 //! Daemon status for the chain and network cards, ported from pong.
 //!
 //! Linux reads the local node stack the way the shell's startup report does:
-//! `systemctl` state per unit, a listening-port check for openclaw, and
-//! bitcoind's block height. macOS has no systemd or local node, so it reads
+//! `systemctl` state per unit and bitcoind's block height. (pong also
+//! checked openclaw's port; dropped 2026-10-24 as unused, which leaves the
+//! network card's third row free.) macOS has no systemd or local node, so it reads
 //! `brew services` plus TCP port checks, and the results fill the two cards
 //! in order. Every read is unprivileged and local-only; a probe that fails
 //! reads as unknown ("—"), so one dead daemon never blanks a card.
@@ -56,7 +57,7 @@ impl ServicesState {
         let dash = |c: &str| row(c, "—", Tone::Muted);
         ServicesState {
             chain: vec![dash("BTCD"), dash("ELEC"), dash("BLOCK")],
-            net: vec![dash("NGNX"), dash("CLAW"), dash("TOR")],
+            net: vec![dash("NGNX"), dash("TOR")],
         }
     }
 }
@@ -78,7 +79,9 @@ fn unit_row(caption: &str, active: &str, sub: &str) -> Row {
     }
 }
 
-/// A port probe: listening / not / unknown -> UP / DOWN / —.
+/// A port probe: listening / not / unknown -> UP / DOWN / —. Used by the
+/// macOS backend.
+#[cfg_attr(not(target_os = "macos"), allow(dead_code))]
 fn probe_row(caption: &str, up: Option<bool>) -> Row {
     match up {
         Some(true) => row(caption, "UP", Tone::Ok),
@@ -115,13 +118,6 @@ fn block_row(info: &str) -> Row {
     }
 }
 
-/// Does `ss -H -tuln` show anything on this port? A substring match, as the
-/// shell's grep. None if `ss` gave nothing.
-#[cfg_attr(target_os = "macos", allow(dead_code))]
-fn port_listening(ss_out: &str, port: u16) -> Option<bool> {
-    (!ss_out.trim().is_empty()).then(|| ss_out.contains(&format!(":{port}")))
-}
-
 // ---------------------------------------------------------------------------
 // Probes
 
@@ -141,8 +137,6 @@ mod backend {
     /// (caption, systemd unit) for the four unit rows.
     const UNITS: [(&str, &str); 4] =
         [("BTCD", "bitcoind"), ("ELEC", "electrs"), ("NGNX", "nginx"), ("TOR", "tor@default")];
-    /// openclaw's default listening port.
-    const OPENCLAW_PORT: u16 = 18789;
 
     async fn unit(caption: &str, unit: &str) -> Row {
         let active = probe("systemctl", &["is-active", unit], TIMEOUT).await;
@@ -152,18 +146,17 @@ mod backend {
 
     pub async fn fetch() -> ServicesState {
         let [btcd, elec, ngnx, tor] = UNITS;
-        let (btcd, elec, ngnx, tor, ss, info) = tokio::join!(
+        let (btcd, elec, ngnx, tor, info) = tokio::join!(
             unit(btcd.0, btcd.1),
             unit(elec.0, elec.1),
             unit(ngnx.0, ngnx.1),
             unit(tor.0, tor.1),
-            probe("ss", &["-H", "-tuln"], TIMEOUT),
             // finds its cookie under the default datadir, as the shell does
             probe("bitcoin-cli", &["getblockchaininfo"], TIMEOUT),
         );
         ServicesState {
             chain: vec![btcd, elec, block_row(&info)],
-            net: vec![ngnx, probe_row("CLAW", port_listening(&ss, OPENCLAW_PORT)), tor],
+            net: vec![ngnx, tor],
         }
     }
 }
@@ -242,7 +235,6 @@ mod tests {
 
     const BLOCKCHAININFO: &str = include_str!("../tests/fixtures/bitcoin-getblockchaininfo.json");
     const BREW: &str = include_str!("../tests/fixtures/brew-services.json");
-    const SS: &str = include_str!("../tests/fixtures/ss-tuln.txt");
 
     #[test]
     fn unit_states() {
@@ -267,10 +259,9 @@ mod tests {
 
     #[test]
     fn port_probe() {
-        assert_eq!(port_listening(SS, 18789), Some(true));
-        assert_eq!(port_listening(SS, 50001), Some(false));
-        assert_eq!(port_listening("", 18789), None);
-        assert_eq!(probe_row("CLAW", Some(false)), row("CLAW", "DOWN", Tone::Auburn));
+        assert_eq!(probe_row("ELEC", Some(true)), row("ELEC", "UP", Tone::Ok));
+        assert_eq!(probe_row("ELEC", Some(false)), row("ELEC", "DOWN", Tone::Auburn));
+        assert_eq!(probe_row("ELEC", None), row("ELEC", "—", Tone::Muted));
     }
 
     #[test]

@@ -48,6 +48,25 @@ Rust core with GTK4 + SwiftUI shells (about twice the UI work).
   apply here.
 - **Config:** the same `calendars.json`, `weather.json`, `theme.json`
   formats.
+- **Icons:** pong's marks, unchanged (confirmed 2026-10-24).
+- **Typefaces** (as pong draws them, checked in `pong_lock.py`):
+  - labels and everything outside the centre — **Ubuntu** (the classic
+    face, `UBUNTU_STACK`; on 26.04 "ubuntu" resolves to it, not to Ubuntu
+    Sans, though both are installed);
+  - the clock — **Google Sans Flex Bold** (pong loads the static
+    `GoogleSansFlex-Bold-Static.ttf` from `~/.local/share/fonts`);
+  - calendar event labels and key captions — **DejaVu Sans Bold**
+    (`SANS_STACK`, chosen for glyph coverage).
+  Switching labels to Ubuntu Sans is a one-line change in
+  `tailwind.config.ts` if wanted. On macOS none of these ship with the
+  system, so step 5 decides whether to bundle them (Ubuntu Font Licence and
+  OFL both allow it) or fall back as pong did (Helvetica).
+
+## Dropped
+
+- **openclaw** (2026-10-24): not used. pong's network card checked its
+  port (the CLAW row); ding does not. The card keeps its three-row shape,
+  so its third row is free for another daemon later.
 
 ## The paddles
 

@@ -17,3 +17,7 @@
   floating times are read in local time; cancelled events are left out.
 - `ding --check` prints one fetch of everything as JSON; `ding --list-cities`.
 - Window shows a plain readout of the live data (layout in step 3).
+- Dropped pong's openclaw port check (unused); the network card shows
+  nginx and tor.
+- Tailwind font families for pong's three faces: Ubuntu, Google Sans Flex,
+  DejaVu Sans.
