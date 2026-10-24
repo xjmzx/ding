@@ -1,0 +1,42 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Rust / Tauri
+src-tauri/target/
+src-tauri/gen/
+
+# Local
+.claude/
+*.local
+
+# Private data stays local (docs/plan.md, "Still open"). These are ding's
+# real config files; they belong in the per-OS config folder, never here.
+calendars.json
+weather.json
+theme.json
+geocode.json
+*.ics
+# Test fixtures are made up, so they may be committed.
+!src-tauri/tests/fixtures/**

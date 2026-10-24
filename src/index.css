@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Theme palettes — channel triples consumed by tailwind.config.ts as
+   rgb(var(--c-x) / <alpha-value>). Copied verbatim from pong's THEMES
+   (pong_lock.py), which mirrored ndisc.smpl's index.css at the time:
+   :root is fizx, .theme-upleb the orange twin. The Rust side picks one per
+   launch (src-tauri/src/theme.rs) and App.tsx sets the class.
+
+   ding keeps both colour themes rather than the suite's monochrome default:
+   it is an existing colour set carried over from pong, not a new app. */
+:root {
+  --c-bg: 9 13 18;
+  --c-panel: 13 17 23;
+  --c-fg: 240 246 252;
+  --c-muted: 107 122 141;
+  --c-accent: 122 240 205;
+  --c-mauve: 189 168 251;
+  --c-auburn: 178 96 138;
+  --c-ok: 74 222 128;
+  --c-alert: 248 113 113;
+}
+
+.theme-upleb {
+  --c-bg: 10 15 21;
+  --c-panel: 13 17 23;
+  --c-fg: 201 209 217;
+  --c-muted: 107 122 141;
+  --c-accent: 255 182 158;
+  --c-mauve: 255 198 117;
+  --c-auburn: 178 96 58;
+  --c-ok: 74 222 128;
+  --c-alert: 248 113 113;
+}
+
+/* Structural tones: the same under both themes (pong's PAL_* and
+   WHITE_TEXT). */
+:root {
+  --c-net: 30 34 40; /* rounded tile-highlight frames */
+  --c-grid-main: 18 19 22; /* main grid lines */
+  --c-grid-sub: 12 13 15; /* graph-paper sub-grid */
+  --c-kb-dim: 55 60 67; /* dim key outlines and labels */
+  --c-text: 240 246 252; /* main text, identical in both themes */
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-bg text-text font-sans antialiased;
+  margin: 0;
+  overflow: hidden;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+}
