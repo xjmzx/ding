@@ -31,7 +31,7 @@ export default {
         // labels and everything outside the centre (pong's UBUNTU_STACK)
         sans: ["Ubuntu", "Helvetica", "Arial", "Nimbus Sans", "Liberation Sans", "sans-serif"],
         // the clock, used bold
-        clock: ["Google Sans Flex", "Roboto", "Inter", "IBM Plex Sans", "Ubuntu", "Helvetica", "sans-serif"],
+        clock: ["Ding Clock", "Google Sans Flex", "Roboto", "Inter", "IBM Plex Sans", "Ubuntu", "Helvetica", "sans-serif"],
         // calendar event labels and key captions, used bold (SANS_STACK)
         event: ["DejaVu Sans Condensed", "DejaVu Sans", "Helvetica", "Arial", "Nimbus Sans", "Liberation Sans", "sans-serif"],
         mono: ["Ubuntu Mono", "DejaVu Sans Mono", "Menlo", "monospace"],

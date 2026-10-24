@@ -53,8 +53,12 @@ Rust core with GTK4 + SwiftUI shells (about twice the UI work).
   - labels and everything outside the centre — **Ubuntu** (the classic
     face, `UBUNTU_STACK`; on 26.04 "ubuntu" resolves to it, not to Ubuntu
     Sans, though both are installed);
-  - the clock — **Google Sans Flex Bold** (pong loads the static
-    `GoogleSansFlex-Bold-Static.ttf` from `~/.local/share/fonts`);
+  - the clock, card values and date numerals — **Google Sans Flex Bold**,
+    the static `GoogleSansFlex-Bold-Static.ttf` pong loads. ding bundles
+    that exact file (`src/assets/fonts/`, SIL OFL 1.1, licence alongside),
+    so it matches pong and the Mac build has it. The face raises the colon
+    only when it sits between digits, so the clock must stay one run of
+    text (the colon blink is a mask, not a separate element);
   - calendar event labels and key captions — **DejaVu Sans Condensed
     Bold** (`SANS_STACK` asks for DejaVu Sans bold; pygame resolves that to
     the condensed bold file, so that is what pong draws).
@@ -71,8 +75,17 @@ Rust core with GTK4 + SwiftUI shells (about twice the UI work).
 
 ## The paddles
 
-- Kept **in place and static**, at pong's size, margin and colour (clock-tone,
-  ~50% alpha). Reserved for a future feature; no behaviour for now.
+- At pong's size, margin and colour (mauve at a flashed tile's alpha), but
+  **resting on the lattice's bottom edge** rather than mid-height.
+- **Hops** (2026-10-24), eased like a throw, nothing at launch:
+  - left paddle, every minute: rises until its top meets the lattice's top
+    edge, then drops back (2.4 s);
+  - right paddle, marking the clock face: the hour to the top, the half
+    hour halfway, :15 and :45 a quarter, other 5-minute marks a small
+    bounce (8%). A smaller hop is quicker, by the square root of its
+    height, as a real throw is (1.7 s, 1.2 s, 0.7 s). With the clock's
+  colon blinking each second, this keeps the screen from looking frozen
+  between minute changes.
 - The ball goes. It was already invisible; it only drove the paddles and the
   mini-tile flashes. **The tile flashes go with it** for now, since nothing
   moves to trigger them.

@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* pong's clock face: the static Google Sans Flex Bold file pong loads,
+   bundled so ding draws the same glyphs (the variable font's colon sits
+   lower at clock size) and so macOS has it too. SIL OFL 1.1, see
+   src/assets/fonts/OFL.txt. The file's style is named Regular but its
+   glyphs are Bold; the weight range stops the browser faking bold. */
+@font-face {
+  font-family: "Ding Clock";
+  src: url("./assets/fonts/GoogleSansFlex-Bold-Static.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: block;
+}
+
 /* Theme palettes — channel triples consumed by tailwind.config.ts as
    rgb(var(--c-x) / <alpha-value>). Copied verbatim from pong's THEMES
    (pong_lock.py), which mirrored ndisc.smpl's index.css at the time:

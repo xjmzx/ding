@@ -10,6 +10,16 @@ export default function App() {
   const [ident, setIdent] = useState<Identity | null>(null);
   const snap = useSnapshot();
 
+  // Text is measured to place it, so wait for the bundled clock face
+  // before the first draw (at most a second).
+  const [fontReady, setFontReady] = useState(false);
+  useEffect(() => {
+    const done = () => setFontReady(true);
+    const timer = window.setTimeout(done, 1000);
+    document.fonts.load('bold 40px "Ding Clock"').then(done, done);
+    return () => window.clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     getTheme()
       .catch((): ThemeName => "fizx")
@@ -30,6 +40,6 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  if (!theme || !pal) return null;
+  if (!theme || !pal || !fontReady) return null;
   return <Dashboard snap={snap} pal={pal} ident={ident} />;
 }

@@ -2,7 +2,7 @@
 // absolutely placed pieces, scaled to fit the window. Pieces are in pong's
 // drawing order. See docs/plan.md, step 3.
 
-import { memo, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import { memo, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { CalendarState, Snapshot, Tone } from "../lib/data";
 import type { Identity } from "../lib/tauri";
 import {
@@ -15,6 +15,7 @@ import {
   HL_RADIUS,
   LABEL_GAP,
   LAT_COLS,
+  LAT_H,
   LAT_ROWS,
   LAT_W,
   LAT_X,
@@ -202,15 +203,35 @@ function HostCard({ pal, ident }: { pal: Palette; ident: Identity | null }) {
   );
 }
 
-/** Large focal time; the colon is pinned to the clock region's centre. */
+/** Large focal time; the colon is pinned to the clock region's centre and
+ *  blinks once a second (lit for the first half), so the screen visibly
+ *  ticks between minute changes.
+ *
+ *  The time stays one run of text: Google Sans Flex raises the colon only
+ *  when it sits between digits, so splitting it out would drop it onto the
+ *  baseline. The blink is a mask over the colon's strip instead. */
 function Clock({ pal, now }: { pal: Palette; now: Date }) {
   const font = FONTS.clock(260);
   const hh = String(now.getHours()).padStart(2, "0");
   const mm = String(now.getMinutes()).padStart(2, "0");
-  const text = `${hh}:${mm}`;
-  const colon = (textWidth(font, hh) + textWidth(font, `${hh}:`)) / 2;
+  const lead = textWidth(font, hh);
+  const through = textWidth(font, `${hh}:`);
+  const colon = (lead + through) / 2;
   const { height } = fontBox(font);
   const r = RECTS.clock;
+
+  // dim the colon for the second half of each second
+  const [dim, setDim] = useState(false);
+  useEffect(() => {
+    setDim(false);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const id = window.setTimeout(() => setDim(true), 500);
+    return () => window.clearTimeout(id);
+  }, [now]);
+  const mask = dim
+    ? `linear-gradient(to right, #000 ${lead}px, rgba(0,0,0,0.2) ${lead}px, rgba(0,0,0,0.2) ${through}px, #000 ${through}px)`
+    : "none";
+
   return (
     <div
       style={{
@@ -221,9 +242,11 @@ function Clock({ pal, now }: { pal: Palette; now: Date }) {
         lineHeight: `${height}px`,
         color: rgba(pal.accent),
         whiteSpace: "pre",
+        maskImage: mask,
+        WebkitMaskImage: mask,
       }}
     >
-      {text}
+      {`${hh}:${mm}`}
     </div>
   );
 }
@@ -543,30 +566,86 @@ function ViewToggle({ pal, view, onToggle }: { pal: Palette; view: View; onToggl
   );
 }
 
-/** Static, in pong's resting place: centred on each side. Kept for a
- *  future effect (docs/plan.md, "The paddles"). */
-function Paddles({ pal }: { pal: Palette }) {
-  const y = LOGICAL_H / 2 - PADDLE_H / 2;
+/** Paddle travel: resting with its foot on the lattice's bottom edge, a
+ *  full hop rises until its head meets the lattice's top edge. */
+const PADDLE_REST_Y = LAT_Y + LAT_H - PADDLE_H;
+const PADDLE_RISE = PADDLE_REST_Y - LAT_Y; // 732
+/** A full hop's duration (up and back). Smaller hops take less time, in
+ *  proportion to the square root of their height, as a real throw does. */
+const PADDLE_HOP_MS = 2400;
+
+/** How high the right paddle hops when the clock reaches minute `m`, as a
+ *  fraction of the full rise: the hour to the top, the half hour halfway,
+ *  the quarters a quarter, other 5-minute marks a small bounce. */
+function markHeight(m: number): number {
+  if (m === 0) return 1;
+  if (m === 30) return 0.5;
+  if (m % 15 === 0) return 0.25;
+  if (m % 5 === 0) return 0.08;
+  return 0;
+}
+
+/** One rise and fall to `fraction` of the full height: eases out going up,
+ *  eases in coming down, so it reads as a throw against gravity. */
+function hopPaddle(el: HTMLElement | null, fraction: number) {
+  if (!el || fraction <= 0 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  el.animate(
+    [
+      { transform: "translateY(0)", easing: "cubic-bezier(0.2, 0.7, 0.3, 1)" },
+      { transform: `translateY(${-Math.round(PADDLE_RISE * fraction)}px)`, offset: 0.5, easing: "cubic-bezier(0.6, 0, 0.8, 0.3)" },
+      { transform: "translateY(0)" },
+    ],
+    { duration: Math.round(PADDLE_HOP_MS * Math.sqrt(fraction)) },
+  );
+}
+
+/** Both paddles rest on the lattice baseline. On each minute change the
+ *  left one hops to the top; the right one marks the clock face (see
+ *  markHeight), so on the hour both go to the top. Nothing moves at launch,
+ *  only on a change. */
+function Paddles({ pal, now }: { pal: Palette; now: Date }) {
+  const left = useRef<HTMLDivElement>(null);
+  const right = useRef<HTMLDivElement>(null);
+  const minute = Math.floor(now.getTime() / 60_000);
+  const seen = useRef<number | null>(null);
+
+  useEffect(() => {
+    const prev = seen.current;
+    seen.current = minute;
+    if (prev === null || minute === prev) return;
+    hopPaddle(left.current, 1);
+    hopPaddle(right.current, markHeight(new Date(minute * 60_000).getMinutes()));
+  }, [minute]);
+
   const style = (x: number): CSSProperties => ({
-    ...box({ x, y, w: PADDLE_W, h: PADDLE_H }),
+    ...box({ x, y: PADDLE_REST_Y, w: PADDLE_W, h: PADDLE_H }),
     background: rgba(pal.mauve, A.paddle),
     borderRadius: PADDLE_W / 2,
+    willChange: "transform",
   });
   return (
     <>
-      <div data-paddle="left" style={style(PADDLE_MARGIN)} />
-      <div data-paddle="right" style={style(LOGICAL_W - PADDLE_MARGIN - PADDLE_W)} />
+      <div ref={left} data-paddle="left" style={style(PADDLE_MARGIN)} />
+      <div ref={right} data-paddle="right" style={style(LOGICAL_W - PADDLE_MARGIN - PADDLE_W)} />
     </>
   );
 }
 
 // ---------------------------------------------------------------------------
 
+/** The current time, updated just after each whole second, so the colon
+ *  blink and the minute change land on the real tick. */
 function useNow(): Date {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
-    const id = window.setInterval(() => setNow(new Date()), 1000);
-    return () => window.clearInterval(id);
+    let id = 0;
+    const tick = () => {
+      const t = new Date();
+      setNow(t);
+      id = window.setTimeout(tick, 1000 - t.getMilliseconds() + 5);
+    };
+    id = window.setTimeout(tick, 1000 - new Date().getMilliseconds() + 5);
+    return () => window.clearTimeout(id);
   }, []);
   return now;
 }
@@ -593,7 +672,7 @@ export default function Dashboard({ snap, pal, ident }: { snap: Snapshot | null;
       {snap && <WeekStrip cal={snap.calendar} pal={pal} view={view} washPriority={washPriority} now={now} />}
       <Header pal={pal} now={now} />
       <ViewToggle pal={pal} view={view} onToggle={() => setView((v) => (v === "clock" ? "calendar" : "clock"))} />
-      <Paddles pal={pal} />
+      <Paddles pal={pal} now={now} />
     </Stage>
   );
 }

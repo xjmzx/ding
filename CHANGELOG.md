@@ -31,3 +31,14 @@
 - `wash_priority` in calendars.json replaces pong's hard-coded calendar
   names for the day tints.
 - Browser dev mode with made-up data (`src/dev/mock.ts`, `?theme=upleb`).
+- Live cues, so the dashboard never looks frozen: the clock's colon blinks
+  each second (lit for the first half), and the paddles rest on the
+  lattice's baseline, the left one rising and falling on each minute
+  change and the right one marking the clock face: full height on the
+  hour, half on the half hour, a quarter on the quarters, a small bounce
+  on other 5-minute marks. The clock now ticks on
+  real second boundaries. Both respect reduced-motion.
+- Bundled pong's clock face (static Google Sans Flex Bold, SIL OFL 1.1) for
+  the clock, card values and date numerals. The clock stays one run of text
+  so the font raises the colon between the digits, as in pong; the blink
+  dims the colon with a mask.
