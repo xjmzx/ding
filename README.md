@@ -6,8 +6,10 @@ calendars, and the status of the daemons on this machine (*d* for daemons;
 rebuilt as a Tauri app without the Pong animation. Same layout, same
 fizx/upleb theme alternation.
 
-**Status:** early. Step 1 of [docs/plan.md](docs/plan.md) — the app shell,
-config folders and theme switching. The dashboard itself is not built yet.
+**Status:** early. Steps 1–2 of [docs/plan.md](docs/plan.md) are done: the
+app shell, config folders, theme switching, and the data back end (weather,
+air quality, calendars, daemon status). The window shows a plain readout of
+that data; the dashboard layout comes next.
 
 ## Build and install
 
@@ -50,6 +52,45 @@ file. The daemon checks probe `localhost` only.
 
 `alternate` (the default) flips between fizx and upleb on each launch; the
 first launch is fizx. `"fizx"` or `"upleb"` pins one.
+
+## Command line
+
+```
+ding --list-cities   # the 162 bundled cities for weather.json
+ding --check         # fetch everything once, print it as JSON, no window
+```
+
+`--check` reads the same config as the app (a debug build reads `ding-dev`).
+Its output includes your calendar events, so treat it as private.
+
+### Weather (`weather.json`)
+
+Up to three cities; the first also drives sunrise/sunset and the 3-day
+forecast. An entry is a name (`"Edinburgh"`), coordinates
+(`"55.95,-3.19"`), or an object with `name`, `latitude` + `longitude` and
+`label`. Bundled names resolve offline; other names are geocoded once via
+Open-Meteo and cached. `"model"` optionally pins an Open-Meteo model.
+Refreshed every 30 minutes.
+
+### Calendars (`calendars.json`)
+
+```json
+{ "calendars": [
+  { "name": "Jog", "url": "https://calendar.google.com/calendar/ical/.../basic.ics", "color": "pistachio" }
+] }
+```
+
+Google Calendar's private iCal address (Settings and sharing → Integrate
+calendar → Secret address in iCal format). Treat it as a password. `color` is
+a Google colour name or `#rrggbb`. Refreshed every 10 minutes; a calendar
+whose fetch fails keeps its last events.
+
+### Daemons
+
+Linux: `systemctl` state for bitcoind, electrs, nginx and tor, a check for
+openclaw's port, and bitcoind's block height via `bitcoin-cli`. macOS: `brew
+services` plus port checks for bitcoind and electrs. Every 20 seconds, local
+only.
 
 ## Keys
 

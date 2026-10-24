@@ -1,0 +1,14 @@
+{
+  "chain": "main",
+  "blocks": 932145,
+  "headers": 932145,
+  "bestblockhash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "difficulty": 1.0,
+  "time": 1792800000,
+  "mediantime": 1792798000,
+  "verificationprogress": 0.99999812,
+  "initialblockdownload": false,
+  "size_on_disk": 1000000000,
+  "pruned": false,
+  "warnings": ""
+}

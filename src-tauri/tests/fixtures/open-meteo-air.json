@@ -1,0 +1,4 @@
+[
+  { "latitude": 21.0, "longitude": 105.8, "current": { "time": "2026-10-23T14:00", "us_aqi": 154 } },
+  { "latitude": 55.9, "longitude": -3.2, "current": { "time": "2026-10-23T08:00", "us_aqi": 17.6 } }
+]
