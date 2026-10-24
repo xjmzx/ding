@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { inTauri } from "./tauri";
+import { mockSnapshot } from "../dev/mock";
 
 // Mirrors the Rust types in src-tauri/src/{weather,calendar,services}.rs.
 
@@ -56,7 +57,8 @@ export interface Snapshot {
 
 /** The live dashboard data: the current snapshot, then each update. */
 export function useSnapshot(): Snapshot | null {
-  const [snap, setSnap] = useState<Snapshot | null>(null);
+  // a plain browser in dev mode gets made-up data (src/dev/mock.ts)
+  const [snap, setSnap] = useState<Snapshot | null>(() => (!inTauri && import.meta.env.DEV ? mockSnapshot() : null));
 
   useEffect(() => {
     if (!inTauri) return;

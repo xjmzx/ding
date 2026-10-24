@@ -54,6 +54,7 @@ pub fn ensure_config() {
     let body = serde_json::json!({
         "_comment": "Drop one entry per Google Calendar to surface: {\"name\": \"Jog\", \"url\": \"https://calendar.google.com/calendar/ical/.../basic.ics\", \"color\": \"pistachio\"}. Get the URL from Calendar > Settings and sharing > Integrate calendar > Secret address in iCal format. Keep this file private (mode 0600): anyone with a URL can read the calendar.",
         "calendars": [],
+        "wash_priority": [],
     });
     if fs::write(&path, serde_json::to_string_pretty(&body).unwrap() + "\n").is_ok() {
         #[cfg(unix)]
@@ -64,16 +65,23 @@ pub fn ensure_config() {
     }
 }
 
-pub fn load_config() -> Vec<CalConfig> {
-    #[derive(Deserialize)]
-    struct File {
-        #[serde(default)]
-        calendars: Vec<CalConfig>,
-    }
+/// `calendars.json`.
+#[derive(Debug, Clone, Default, Deserialize)]
+pub struct CalFile {
+    #[serde(default)]
+    pub calendars: Vec<CalConfig>,
+    /// Calendar names whose colour tints a day's background in the week
+    /// strip, highest first. A day with events from none of them gets the
+    /// theme's mauve. pong hard-coded this list; here it is config so no
+    /// calendar name lives in the source.
+    #[serde(default)]
+    pub wash_priority: Vec<String>,
+}
+
+pub fn load_config() -> CalFile {
     fs::read_to_string(config_path())
         .ok()
-        .and_then(|s| serde_json::from_str::<File>(&s).ok())
-        .map(|f| f.calendars)
+        .and_then(|s| serde_json::from_str::<CalFile>(&s).ok())
         .unwrap_or_default()
 }
 

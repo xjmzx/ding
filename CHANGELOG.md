@@ -16,8 +16,18 @@
   a failed fetch keeps the calendar's last events; all-day events and
   floating times are read in local time; cancelled events are left out.
 - `ding --check` prints one fetch of everything as JSON; `ding --list-cities`.
-- Window shows a plain readout of the live data (layout in step 3).
 - Dropped pong's openclaw port check (unused); the network card shows
   nginx and tor.
 - Tailwind font families for pong's three faces: Ubuntu, Google Sans Flex,
   DejaVu Sans.
+- Dashboard layout ported from pong on its 1920×1080 canvas, scaled to the
+  window: mini-tile lattice (one element per tile), weekend brackets, group
+  outlines, card tints, palette card, user@host card, colon-pinned clock,
+  the five bottom-band cards, the week strip with day washes and event
+  chips, the 4-week calendar view and its toggle, static paddles. Checked
+  against offscreen pong renders of the same made-up data, both themes.
+- Event chips use DejaVu Sans Condensed Bold, which is what pong's
+  "dejavu sans" bold resolves to.
+- `wash_priority` in calendars.json replaces pong's hard-coded calendar
+  names for the day tints.
+- Browser dev mode with made-up data (`src/dev/mock.ts`, `?theme=upleb`).

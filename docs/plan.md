@@ -55,8 +55,9 @@ Rust core with GTK4 + SwiftUI shells (about twice the UI work).
     Sans, though both are installed);
   - the clock — **Google Sans Flex Bold** (pong loads the static
     `GoogleSansFlex-Bold-Static.ttf` from `~/.local/share/fonts`);
-  - calendar event labels and key captions — **DejaVu Sans Bold**
-    (`SANS_STACK`, chosen for glyph coverage).
+  - calendar event labels and key captions — **DejaVu Sans Condensed
+    Bold** (`SANS_STACK` asks for DejaVu Sans bold; pygame resolves that to
+    the condensed bold file, so that is what pong draws).
   Switching labels to Ubuntu Sans is a one-line change in
   `tailwind.config.ts` if wanted. On macOS none of these ship with the
   system, so step 5 decides whether to bundle them (Ubuntu Font Licence and

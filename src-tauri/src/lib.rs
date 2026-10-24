@@ -36,6 +36,21 @@ fn snapshot(state: tauri::State<Shared>) -> Snapshot {
     state.lock().unwrap().clone()
 }
 
+/// The `user@host` and version card.
+#[derive(Clone, Serialize)]
+struct Identity {
+    user: String,
+    host: String,
+    version: &'static str,
+    /// From calendars.json: calendar names that tint a day, highest first.
+    wash_priority: Vec<String>,
+}
+
+#[tauri::command]
+fn identity(state: tauri::State<Identity>) -> Identity {
+    state.inner().clone()
+}
+
 /// Esc / Q in the window.
 #[tauri::command]
 fn quit(app: AppHandle) {
@@ -55,7 +70,7 @@ pub fn check() {
     weather::ensure_config();
     calendar::ensure_config();
     let weather_cfg = weather::load_config();
-    let cal_cfgs = calendar::load_config();
+    let cal_cfgs = calendar::load_config().calendars;
     let client = reqwest::Client::builder()
         .user_agent(concat!("ding/", env!("CARGO_PKG_VERSION")))
         .build()
@@ -173,7 +188,14 @@ pub fn run() {
     weather::ensure_config();
     calendar::ensure_config();
     let weather_cfg = weather::load_config();
-    let cal_cfgs = calendar::load_config();
+    let cal_file = calendar::load_config();
+    let cal_cfgs = cal_file.calendars;
+    let ident = Identity {
+        user: std::env::var("USER").or_else(|_| std::env::var("USERNAME")).unwrap_or_default(),
+        host: gethostname::gethostname().to_string_lossy().into_owned(),
+        version: env!("CARGO_PKG_VERSION"),
+        wash_priority: cal_file.wash_priority,
+    };
 
     let shared: Shared = Arc::new(Mutex::new(Snapshot {
         weather: weather::WeatherState::seeded(&weather_cfg),
@@ -190,12 +212,13 @@ pub fn run() {
             }
         }))
         .manage(Theme(theme_name))
+        .manage(ident)
         .manage(shared.clone())
         .setup(move |app| {
             start_timers(app.handle(), shared, weather_cfg, cal_cfgs);
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![theme, snapshot, quit])
+        .invoke_handler(tauri::generate_handler![theme, snapshot, identity, quit])
         .run(tauri::generate_context!())
         .expect("error while running ding");
 }

@@ -6,10 +6,14 @@ calendars, and the status of the daemons on this machine (*d* for daemons;
 rebuilt as a Tauri app without the Pong animation. Same layout, same
 fizx/upleb theme alternation.
 
-**Status:** early. Steps 1–2 of [docs/plan.md](docs/plan.md) are done: the
-app shell, config folders, theme switching, and the data back end (weather,
-air quality, calendars, daemon status). The window shows a plain readout of
-that data; the dashboard layout comes next.
+**Status:** steps 1–3 of [docs/plan.md](docs/plan.md) are done: the app
+shell, the data back end, and pong's dashboard layout — clock view and the
+4-week calendar view (toggle at the top right), both themes. Packaging and
+releases come next.
+
+For layout work without the app, `npm run dev` in a plain browser shows the
+dashboard with made-up data (`src/dev/mock.ts`); add `?theme=upleb` for the
+other theme.
 
 ## Build and install
 
@@ -79,6 +83,10 @@ Refreshed every 30 minutes.
   { "name": "Jog", "url": "https://calendar.google.com/calendar/ical/.../basic.ics", "color": "pistachio" }
 ] }
 ```
+
+`wash_priority` (optional) lists calendar names whose colour tints a day in
+the week strip, highest first; other event days get the theme's mauve:
+`"wash_priority": ["Leave", "Run"]`.
 
 Google Calendar's private iCal address (Settings and sharing → Integrate
 calendar → Secret address in iCal format). Treat it as a password. `color` is
