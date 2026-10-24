@@ -127,6 +127,8 @@ Rust core with GTK4 + SwiftUI shells (about twice the UI work).
 3. **Match the dashboard** — every card, the layout and both themes, checked
    side by side against `pong --dashboard`.
 4. **Ship** — tag-triggered release for Linux `.deb`, macOS `.dmg`, Windows.
+   The `.deb` job is in place (2026-10-24, modelled on dstack's
+   `release.yml`); macOS and Windows jobs follow nping's.
    Then point pong's README at ding; pong stays private as an archive.
 5. **macOS** — the dashboard comes with step 3; check `brew services` and the
    port probes on the Mac.

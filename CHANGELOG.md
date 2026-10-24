@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.0 — 2026-10-24
 
 - App shell from dnsubs: Tauri 2, React 19, Tailwind v3.
 - Per-OS config and cache folders (`ding`, `ding-dev` for debug builds).
@@ -42,3 +42,6 @@
   the clock, card values and date numerals. The clock stays one run of text
   so the font raises the colon between the digits, as in pong; the blink
   dims the colon with a mask.
+- Release workflow: a `v*` tag runs the tests, builds the `.deb` (Linux
+  x86_64) and publishes it on a GitHub Release, as dstack's does. macOS and
+  Windows jobs to follow, in nping's shape.

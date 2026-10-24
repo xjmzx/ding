@@ -1,0 +1,112 @@
+name: Release
+
+# Fires on any pushed tag starting with `v` (e.g. v0.1.0, v0.2.0-beta.1) and
+# can also be kicked off manually from the Actions tab. Publishes a GitHub
+# Release with a .deb for Linux x86_64.
+#
+# Linux first. macOS (.dmg) and Windows (NSIS .exe) jobs come later, in the
+# shape nping's release.yml uses: each `needs` this job, which creates the
+# release and owns its notes, and only appends its own asset.
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to publish (e.g. v0.1.0)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-linux-x86_64:
+    name: Build Linux x86_64
+    runs-on: ubuntu-22.04
+    # Action versions below run on the Node 24 Actions runtime (checkout v6,
+    # setup-node v6, action-gh-release v3). GitHub deprecated the Node 20
+    # action runtime in 2025.
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          # Build the ref being released, not whatever the workflow ran from.
+          # A workflow_dispatch names the tag to publish, but checkout defaults
+          # to the branch the run was started on — so without this the build
+          # comes from main and its artifacts get uploaded to that tag's
+          # release, which then holds binaries the tag never contained. A tag
+          # push is unaffected: github.ref is already refs/tags/<tag>.
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      # The standard Tauri Linux set and nothing more: ding holds no secrets
+      # and plays no audio, and its HTTPS is rustls, so no system OpenSSL.
+      - name: Install Tauri system deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libxdo-dev \
+            build-essential \
+            curl wget file
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          # The Node used to run the project build (vite/tsc), independent of
+          # the action runtime above. Node 20 LTS deliberately — changing the
+          # build toolchain is a separate call.
+          node-version: "20"
+          cache: "npm"
+
+      # rust-toolchain.toml pins the compiler; rustup installs that version
+      # on first use, so `stable` here only provides rustup itself.
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo target
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install npm deps
+        run: npm ci
+
+      # Cheap, and they cover what would be embarrassing to ship wrong: the
+      # calendar reader (repeats, time zones, moved and cancelled
+      # instances), weather parsing, the daemon rows. All on made-up
+      # fixtures in src-tauri/tests/fixtures; no network.
+      - name: Test
+        run: cd src-tauri && cargo test --lib
+
+      # .deb only. No rpm (rpmbuild isn't on ubuntu runners) and no AppImage:
+      # it bundled its own webkit2gtk (~80 MB against the .deb's ~6 MB) for
+      # non-Debian distros nobody here runs. Other distros can build from
+      # source.
+      - name: Build Tauri bundle (.deb)
+        run: npm run tauri build -- --bundles deb
+
+      - name: Determine tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          fi
+
+      # `prerelease` is taken from the tag: anything with a hyphen
+      # (v0.2.0-beta.1) is a pre-release, a plain vX.Y.Z is not. Published
+      # directly rather than as a draft, so the assets land on the tagged
+      # release in one step.
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: ${{ steps.tag.outputs.tag }}
+          prerelease: ${{ contains(steps.tag.outputs.tag, '-') }}
+          generate_release_notes: true
+          files: |
+            src-tauri/target/release/bundle/deb/*.deb
