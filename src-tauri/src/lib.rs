@@ -57,14 +57,14 @@ fn quit(app: AppHandle) {
     app.exit(0);
 }
 
-/// `ding --list-cities`, handled before any window opens.
+/// `udash --list-cities`, handled before any window opens.
 pub fn list_cities() {
     cities::print_list(&weather::config_path());
 }
 
-/// `ding --check`: run each fetch once and print the snapshot as JSON,
+/// `udash --check`: run each fetch once and print the snapshot as JSON,
 /// with no window. For debugging config and connectivity. Uses the same
-/// config folders as the app (`ding-dev` in a debug build).
+/// config folders as the app (`udash-dev` in a debug build).
 pub fn check() {
     config::init();
     weather::ensure_config();
@@ -72,7 +72,7 @@ pub fn check() {
     let weather_cfg = weather::load_config();
     let cal_cfgs = calendar::load_config().calendars;
     let client = reqwest::Client::builder()
-        .user_agent(concat!("ding/", env!("CARGO_PKG_VERSION")))
+        .user_agent(concat!("udash/", env!("CARGO_PKG_VERSION")))
         .build()
         .expect("http client");
 
@@ -105,7 +105,7 @@ pub fn check() {
 /// did: edit the files and restart.
 fn start_timers(app: &AppHandle, shared: Shared, weather_cfg: weather::WeatherConfig, cal_cfgs: Vec<calendar::CalConfig>) {
     let client = reqwest::Client::builder()
-        .user_agent(concat!("ding/", env!("CARGO_PKG_VERSION")))
+        .user_agent(concat!("udash/", env!("CARGO_PKG_VERSION")))
         .build()
         .expect("http client");
 
@@ -131,7 +131,7 @@ fn start_timers(app: &AppHandle, shared: Shared, weather_cfg: weather::WeatherCo
                 // Nothing to poll. Logged once so an unconfigured calendar
                 // is not mistaken for a quiet week.
                 eprintln!(
-                    "[ding] calendar/no-config path={} — no calendars configured; the calendar stays empty",
+                    "[udash] calendar/no-config path={} — no calendars configured; the calendar stays empty",
                     calendar::config_path().display()
                 );
                 return;
@@ -148,7 +148,7 @@ fn start_timers(app: &AppHandle, shared: Shared, weather_cfg: weather::WeatherCo
                             errors.push(None);
                         }
                         Err(e) => {
-                            eprintln!("[ding] calendar/fetch-fail name={:?} err={e}", cfg.name);
+                            eprintln!("[udash] calendar/fetch-fail name={:?} err={e}", cfg.name);
                             errors.push(Some(e));
                         }
                     }
@@ -220,5 +220,5 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![theme, snapshot, identity, quit])
         .run(tauri::generate_context!())
-        .expect("error while running ding");
+        .expect("error while running udash");
 }

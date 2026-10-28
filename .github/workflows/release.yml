@@ -39,7 +39,7 @@ jobs:
           # push is unaffected: github.ref is already refs/tags/<tag>.
           ref: ${{ github.event.inputs.tag || github.ref }}
 
-      # The standard Tauri Linux set and nothing more: ding holds no secrets
+      # The standard Tauri Linux set and nothing more: udash holds no secrets
       # and plays no audio, and its HTTPS is rustls, so no system OpenSSL.
       - name: Install Tauri system deps
         run: |

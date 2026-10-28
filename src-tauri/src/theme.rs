@@ -53,7 +53,7 @@ mod tests {
     use std::path::PathBuf;
 
     fn tmp(tag: &str) -> PathBuf {
-        let d = std::env::temp_dir().join(format!("ding-theme-{tag}-{}", std::process::id()));
+        let d = std::env::temp_dir().join(format!("udash-theme-{tag}-{}", std::process::id()));
         let _ = fs::remove_dir_all(&d);
         fs::create_dir_all(&d).unwrap();
         d

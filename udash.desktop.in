@@ -1,11 +1,11 @@
 [Desktop Entry]
 Type=Application
 Version=1.0
-Name=ding
+Name=udash
 GenericName=Dashboard
 Comment=Clock, weather, calendars and daemon status on one screen
-Exec=@BINDIR@/ding
-Icon=@ICONDIR@/ding.svg
+Exec=@BINDIR@/udash
+Icon=@ICONDIR@/udash.svg
 Terminal=false
 Categories=Utility;
 Keywords=dashboard;clock;weather;calendar;daemon;status;

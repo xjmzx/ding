@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.0 — 2026-10-28
+
+- Renamed **ding → udash**: binary, package, `.desktop`, icon, config and
+  cache folders (`udash`, `udash-dev`), identifier `uk.fizx.udash`. Ubuntu
+  ships an unrelated `ding` package (a Tk dictionary, 1.9) whose higher
+  version number made apt replace ding 0.1.0's .deb with it.
+- First run copies `calendars.json`, `weather.json`, `theme.json` from the
+  old `ding` config folder (then pong's, as before) for any file udash lacks.
+
 ## 0.1.0 — 2026-10-24
 
 - App shell from dnsubs: Tauri 2, React 19, Tailwind v3.

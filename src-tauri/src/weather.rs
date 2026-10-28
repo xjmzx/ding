@@ -35,7 +35,7 @@ const CONFIG_COMMENT: &str = "Cities for the dashboard weather tile, up to three
 An entry is either a plain string — a place name (\"Edinburgh\") or explicit \
 coordinates (\"55.95,-3.19\") — or an object with any of name / \
 latitude+longitude / label, where label is the text drawn in the tile. Run \
-`ding --list-cities` for the bundled names: those resolve offline to pinned \
+`udash --list-cities` for the bundled names: those resolve offline to pinned \
 coordinates and a label sized to fit the tile. Any other name is geocoded once \
 via Open-Meteo and cached; give coordinates instead to pin a name the geocoder \
 gets wrong. The FIRST entry is the primary: it also drives the sunrise/sunset \
@@ -508,11 +508,11 @@ pub async fn fetch(client: &reqwest::Client, cfg: &WeatherConfig, prev: &Weather
                 points.push(p);
             }
             Ok(None) => {
-                eprintln!("[ding] weather/geocode-miss loc={:?}", loc.spec);
+                eprintln!("[udash] weather/geocode-miss loc={:?}", loc.spec);
                 point_of.push(None);
             }
             Err(e) => {
-                eprintln!("[ding] weather/geocode-fail loc={:?} err={e}", loc.spec);
+                eprintln!("[udash] weather/geocode-fail loc={:?} err={e}", loc.spec);
                 point_of.push(None);
             }
         }
@@ -532,7 +532,7 @@ pub async fn fetch(client: &reqwest::Client, cfg: &WeatherConfig, prev: &Weather
         }
         match get_json(client, FORECAST_URL, &q).await {
             Ok(v) => forecast = as_list(v),
-            Err(e) => eprintln!("[ding] weather/fetch-fail n={} err={e}", points.len()),
+            Err(e) => eprintln!("[udash] weather/fetch-fail n={} err={e}", points.len()),
         }
         // Separate host, separate failure: a dead AQI card must not cost
         // the temperatures.
@@ -540,7 +540,7 @@ pub async fn fetch(client: &reqwest::Client, cfg: &WeatherConfig, prev: &Weather
         q.push(("current", "us_aqi".into()));
         match get_json(client, AIR_URL, &q).await {
             Ok(v) => air = as_list(v),
-            Err(e) => eprintln!("[ding] aqi/fetch-fail n={} err={e}", points.len()),
+            Err(e) => eprintln!("[udash] aqi/fetch-fail n={} err={e}", points.len()),
         }
     }
 

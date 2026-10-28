@@ -5,7 +5,7 @@
 export const LOGICAL_W = 1920;
 export const LOGICAL_H = 1080;
 
-// Paddles (static in ding; reserved for a future effect)
+// Paddles (static in udash; reserved for a future effect)
 export const PADDLE_W = 48;
 export const PADDLE_H = 144;
 export const PADDLE_MARGIN = 60;

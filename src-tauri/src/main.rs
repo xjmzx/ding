@@ -3,12 +3,12 @@
 
 fn main() {
     if std::env::args().any(|a| a == "--list-cities") {
-        ding_lib::list_cities();
+        udash_lib::list_cities();
         return;
     }
     if std::env::args().any(|a| a == "--check") {
-        ding_lib::check();
+        udash_lib::check();
         return;
     }
-    ding_lib::run()
+    udash_lib::run()
 }

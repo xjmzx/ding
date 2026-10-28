@@ -220,7 +220,7 @@ pub fn find(name: &str) -> Option<&'static City> {
         .find(|c| c.name.eq_ignore_ascii_case(name))
 }
 
-/// `ding --list-cities`.
+/// `udash --list-cities`.
 pub fn print_list(config_path: &std::path::Path) {
     let total: usize = REGIONS.iter().map(|(_, r)| r.len()).sum();
     println!("Bundled cities ({total}). Use a name verbatim in");

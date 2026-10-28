@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 /* pong's clock face: the static Google Sans Flex Bold file pong loads,
-   bundled so ding draws the same glyphs (the variable font's colon sits
+   bundled so udash draws the same glyphs (the variable font's colon sits
    lower at clock size) and so macOS has it too. SIL OFL 1.1, see
    src/assets/fonts/OFL.txt. The file's style is named Regular but its
    glyphs are Bold; the weight range stops the browser faking bold. */
 @font-face {
-  font-family: "Ding Clock";
+  font-family: "Udash Clock";
   src: url("./assets/fonts/GoogleSansFlex-Bold-Static.ttf") format("truetype");
   font-weight: 100 900;
   font-style: normal;
@@ -21,7 +21,7 @@
    :root is fizx, .theme-upleb the orange twin. The Rust side picks one per
    launch (src-tauri/src/theme.rs) and App.tsx sets the class.
 
-   ding keeps both colour themes rather than the suite's monochrome default:
+   udash keeps both colour themes rather than the suite's monochrome default:
    it is an existing colour set carried over from pong, not a new app. */
 :root {
   --c-bg: 9 13 18;

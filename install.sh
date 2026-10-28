@@ -1,5 +1,5 @@
 #!/bin/bash
-# Build ding and install it to /Applications, then relaunch. macOS only.
+# Build udash and install it to /Applications, then relaunch. macOS only.
 #
 #   ./install.sh               # build (release) + quit + install + relaunch
 #   ./install.sh --skip-build  # reinstall the last build without rebuilding
@@ -20,7 +20,7 @@ if [[ "$(uname)" != "Darwin" ]]; then
   exit 1
 fi
 
-APP_NAME="ding.app"
+APP_NAME="udash.app"
 BUILT="src-tauri/target/release/bundle/macos/$APP_NAME"
 
 if [[ "${1:-}" != "--skip-build" ]]; then
@@ -33,7 +33,7 @@ if [[ "${1:-}" != "--skip-build" ]]; then
     echo "--- Installing npm dependencies (first build here) ---"
     npm install
   fi
-  echo "--- Building ding (release) ---"
+  echo "--- Building udash (release) ---"
   npm run tauri build
 fi
 
@@ -42,8 +42,8 @@ if [[ ! -d "$BUILT" ]]; then
   exit 1
 fi
 
-echo "--- Quitting running ding (if any) ---"
-osascript -e 'quit app "ding"' 2>/dev/null || pkill -x ding 2>/dev/null || true
+echo "--- Quitting running udash (if any) ---"
+osascript -e 'quit app "udash"' 2>/dev/null || pkill -x udash 2>/dev/null || true
 sleep 1
 
 echo "--- Installing to /Applications ---"

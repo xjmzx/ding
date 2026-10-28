@@ -360,7 +360,7 @@ fn expand_rule(start: &When, rule: &str, until: DateTime<Utc>) -> Vec<When> {
     let set = match set {
         Ok(s) => s,
         Err(e) => {
-            eprintln!("[ding] calendar/rrule-unreadable rule={rule:?} err={e}");
+            eprintln!("[udash] calendar/rrule-unreadable rule={rule:?} err={e}");
             return vec![start.clone()];
         }
     };
@@ -476,7 +476,7 @@ mod tests {
     #[test]
     fn unfolds_and_unescapes() {
         let evs = parse(FIXTURE);
-        let long = evs.iter().find(|e| e.uid == "folded@ding.test").unwrap();
+        let long = evs.iter().find(|e| e.uid == "folded@udash.test").unwrap();
         assert_eq!(long.summary, "A long summary that Google folds across lines, with commas; and semicolons");
         assert_eq!(long.location, "Room 4, Level 2");
     }
@@ -484,7 +484,7 @@ mod tests {
     #[test]
     fn alarms_do_not_leak_into_the_event() {
         let evs = parse(FIXTURE);
-        let ev = evs.iter().find(|e| e.uid == "alarm@ding.test").unwrap();
+        let ev = evs.iter().find(|e| e.uid == "alarm@udash.test").unwrap();
         assert_eq!(ev.summary, "Dentist");
     }
 

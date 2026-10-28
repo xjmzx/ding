@@ -6,10 +6,10 @@ export const FONTS = {
   // pong's UBUNTU_STACK
   ui: (px: number) => `${px}px Ubuntu, Helvetica, Arial, "Nimbus Sans", "Liberation Sans", sans-serif`,
   // Google Sans Flex Bold (clock, temperatures, date numerals): the bundled
-  // static file pong uses ("Ding Clock", src/index.css), then the installed
+  // static file pong uses ("Udash Clock", src/index.css), then the installed
   // variable font
   clock: (px: number) =>
-    `bold ${px}px "Ding Clock", "Google Sans Flex", Roboto, Inter, "IBM Plex Sans", Ubuntu, Helvetica, sans-serif`,
+    `bold ${px}px "Udash Clock", "Google Sans Flex", Roboto, Inter, "IBM Plex Sans", Ubuntu, Helvetica, sans-serif`,
   // pong's SANS_STACK, bold (event chips). pygame resolves "dejavu sans"
   // bold to DejaVuSansCondensed-Bold, so the condensed face is what pong
   // draws.

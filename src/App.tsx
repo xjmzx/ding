@@ -16,7 +16,7 @@ export default function App() {
   useEffect(() => {
     const done = () => setFontReady(true);
     const timer = window.setTimeout(done, 1000);
-    document.fonts.load('bold 40px "Ding Clock"').then(done, done);
+    document.fonts.load('bold 40px "Udash Clock"').then(done, done);
     return () => window.clearTimeout(timer);
   }, []);
 

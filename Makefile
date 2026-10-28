@@ -11,8 +11,8 @@ ICONDIR ?= $(PREFIX)/share/icons/hicolor/scalable/apps
 # small on the taskbar too); only the .icns keeps the full canvas.
 LINUX_VIEWBOX ?= 49 49 926 926
 
-DESKTOP_OUT := $(APPDIR)/ding.desktop
-TAURI_BIN   := src-tauri/target/release/ding
+DESKTOP_OUT := $(APPDIR)/udash.desktop
+TAURI_BIN   := src-tauri/target/release/udash
 
 .PHONY: help deps dev build deb install uninstall check clean icons version install-guard
 
@@ -102,13 +102,13 @@ install-guard:
 
 install: install-guard $(TAURI_BIN)
 	install -d $(BINDIR) $(APPDIR) $(ICONDIR)
-	install -m 0755 $(TAURI_BIN) $(BINDIR)/ding
+	install -m 0755 $(TAURI_BIN) $(BINDIR)/udash
 	@# Linux fill: crop the grid margin on the way in (see LINUX_VIEWBOX).
-	sed '1s|viewBox="[^"]*"|viewBox="$(LINUX_VIEWBOX)"|' icon.svg > $(ICONDIR)/ding.svg
-	chmod 0644 $(ICONDIR)/ding.svg
+	sed '1s|viewBox="[^"]*"|viewBox="$(LINUX_VIEWBOX)"|' icon.svg > $(ICONDIR)/udash.svg
+	chmod 0644 $(ICONDIR)/udash.svg
 	sed -e 's|@BINDIR@|$(BINDIR)|g' \
 	    -e 's|@ICONDIR@|$(ICONDIR)|g' \
-	    ding.desktop.in > $(DESKTOP_OUT)
+	    udash.desktop.in > $(DESKTOP_OUT)
 	chmod 0644 $(DESKTOP_OUT)
 	@if command -v update-desktop-database >/dev/null 2>&1; then \
 		update-desktop-database $(APPDIR) >/dev/null 2>&1 || true; \
@@ -117,17 +117,17 @@ install: install-guard $(TAURI_BIN)
 		gtk-update-icon-cache -f -t $(PREFIX)/share/icons/hicolor >/dev/null 2>&1 || true; \
 	fi
 	@echo "installed to $(PREFIX)"
-	@echo "  binary  -> $(BINDIR)/ding"
+	@echo "  binary  -> $(BINDIR)/udash"
 	@echo "  desktop -> $(DESKTOP_OUT)"
 
 uninstall:
-	rm -f $(BINDIR)/ding
-	rm -f $(ICONDIR)/ding.svg
+	rm -f $(BINDIR)/udash
+	rm -f $(ICONDIR)/udash.svg
 	rm -f $(DESKTOP_OUT)
 	@if command -v update-desktop-database >/dev/null 2>&1; then \
 		update-desktop-database $(APPDIR) >/dev/null 2>&1 || true; \
 	fi
-	@# install rebuilt the cache with ding.svg in it; left alone, it keeps
+	@# install rebuilt the cache with udash.svg in it; left alone, it keeps
 	@# pointing at the deleted file and shadows the .deb's icon in the shell.
 	@if command -v gtk-update-icon-cache >/dev/null 2>&1; then \
 		gtk-update-icon-cache -f -t $(PREFIX)/share/icons/hicolor >/dev/null 2>&1 || true; \

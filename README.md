@@ -1,8 +1,10 @@
-# ding
+# udash
+
+*Formerly **ding**, renamed in 0.2.0: Ubuntu ships an unrelated `ding`
+package (a Tk dictionary), and apt replaced ding's .deb with it.*
 
 A dashboard on one screen: clock, date, weather and air quality, two
-calendars, and the status of the daemons on this machine (*d* for daemons;
-*ding* like a notification). The successor to **pong**'s dashboard mode,
+calendars, and the status of the daemons on this machine. The successor to **pong**'s dashboard mode,
 rebuilt as a Tauri app without the Pong animation. Same layout, same
 fizx/upleb theme alternation.
 
@@ -43,23 +45,23 @@ git tag v0.1.1 && git push origin main v0.1.1
 It can also be run by hand from the Actions tab, naming an existing tag.
 macOS and Windows builds are not in the workflow yet.
 
-Debug builds keep their config and cache in `ding-dev` folders, so a dev run
+Debug builds keep their config and cache in `udash-dev` folders, so a dev run
 never touches the installed app's state.
 
 ## Configuration
 
-ding reads its config from the per-OS config folder, the same places pong
-used, under `ding` instead of `pong`:
+udash reads its config from the per-OS config folder, the same places pong
+used, under `udash` instead of `pong`:
 
 | OS | Config | Cache |
 | --- | --- | --- |
-| Linux | `$XDG_CONFIG_HOME/ding` or `~/.config/ding` | `$XDG_CACHE_HOME/ding` or `~/.cache/ding` |
-| macOS | `~/Library/Application Support/ding` | `~/Library/Caches/ding` |
-| Windows | `%APPDATA%\ding` | `%LOCALAPPDATA%\ding` |
+| Linux | `$XDG_CONFIG_HOME/udash` or `~/.config/udash` | `$XDG_CACHE_HOME/udash` or `~/.cache/udash` |
+| macOS | `~/Library/Application Support/udash` | `~/Library/Caches/udash` |
+| Windows | `%APPDATA%\udash` | `%LOCALAPPDATA%\udash` |
 
-On first run ding copies `calendars.json`, `weather.json` and `theme.json`
-from pong's config folder, if they are there and ding has none of its own.
-pong's copies are left in place.
+On first run udash copies `calendars.json`, `weather.json` and `theme.json`
+from the old `ding` config folder, then from pong's, for any file it does not
+have yet. The old copies are left in place.
 
 Everything private stays in those folders and never in this repo: calendar
 URLs (treat them as passwords), cities, the theme choice and every cache
@@ -77,11 +79,11 @@ first launch is fizx. `"fizx"` or `"upleb"` pins one.
 ## Command line
 
 ```
-ding --list-cities   # the 162 bundled cities for weather.json
-ding --check         # fetch everything once, print it as JSON, no window
+udash --list-cities   # the 162 bundled cities for weather.json
+udash --check         # fetch everything once, print it as JSON, no window
 ```
 
-`--check` reads the same config as the app (a debug build reads `ding-dev`).
+`--check` reads the same config as the app (a debug build reads `udash-dev`).
 Its output includes your calendar events, so treat it as private.
 
 ### Weather (`weather.json`)
